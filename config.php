@@ -49,4 +49,7 @@ $CFG->sslproxy = ($sslproxy === '1' || strtolower($sslproxy) === 'true');
 $cookiesecure = env('MOODLE_COOKIESECURE', '0');
 $CFG->cookiesecure = ($cookiesecure === '1' || strtolower($cookiesecure) === 'true');
 
+$CFG->debug = E_ALL | E_STRICT;
+$CFG->debugdisplay = true;
+$CFG->dblogerror = true;
 require_once(__DIR__ . '/lib/setup.php');
