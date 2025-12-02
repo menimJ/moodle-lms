@@ -1,50 +1,51 @@
-version: "3.9"
+version: "3.8"
 
 services:
-  db:
-    image: postgres:14
-    container_name: moodle-db
-    restart: unless-stopped
+  mariadb:
+    image: mariadb:10.11
+    container_name: moodle_mariadb
+    restart: always
+    env_file:
+      - .env
     environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    command: [
+      "--character-set-server=utf8mb4",
+      "--collation-server=utf8mb4_unicode_ci"
+    ]
     volumes:
-      - db_data:/var/lib/postgresql/data
-    networks:
-      - moodle-net
+      - mariadb_data:/var/lib/mysql
+    ports:
+      - "3307:3306"
 
   moodle:
     build: .
-    container_name: moodle-app
-    restart: unless-stopped
+    container_name: moodle_app
     depends_on:
-      - db
+      - mariadb
+    restart: always
+    env_file:
+      - .env
     environment:
-      # DB settings (read by config.php via env())
       DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
       DB_NAME: ${DB_NAME}
       DB_USER: ${DB_USER}
       DB_PASS: ${DB_PASS}
-      DB_PORT: ${DB_PORT}
-      DB_PREFIX: ${DB_PREFIX}
 
-      # Moodle URL + paths (local)
       MOODLE_WWWROOT: ${MOODLE_WWWROOT}
       MOODLE_DATAROOT: ${MOODLE_DATAROOT}
 
-      # HTTPS flags (off for local)
       MOODLE_SSLPROXY: ${MOODLE_SSLPROXY}
       MOODLE_COOKIESECURE: ${MOODLE_COOKIESECURE}
-    volumes:
-      - ./moodledata:/var/moodledata
     ports:
       - "8080:80"
-    networks:
-      - moodle-net
+    volumes:
+      - ./:/var/www/html
+      - ./moodledata:/var/moodledata
 
 volumes:
-  db_data:
-
-networks:
-  moodle-net:
+  mariadb_data:
