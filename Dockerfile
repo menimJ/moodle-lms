@@ -26,12 +26,14 @@ RUN apt-get update && apt-get install -y \
   && rm -rf /var/lib/apt/lists/*
 
 # ===== PHP settings tuned for Moodle =====
-RUN echo "max_input_vars=5000"           >  /usr/local/etc/php/conf.d/moodle.ini \
- && echo "memory_limit=256M"            >> /usr/local/etc/php/conf.d/moodle.ini \
- && echo "upload_max_filesize=64M"      >> /usr/local/etc/php/conf.d/moodle.ini \
- && echo "post_max_size=64M"            >> /usr/local/etc/php/conf.d/moodle.ini \
- && echo "opcache.enable=1"             >> /usr/local/etc/php/conf.d/moodle.ini \
- && echo "opcache.validate_timestamps=1">> /usr/local/etc/php/conf.d/moodle.ini
+RUN echo "max_input_vars=5000"              >  /usr/local/etc/php/conf.d/moodle.ini \
+ && echo "memory_limit=512M"               >> /usr/local/etc/php/conf.d/moodle.ini \
+ && echo "upload_max_filesize=64M"         >> /usr/local/etc/php/conf.d/moodle.ini \
+ && echo "post_max_size=64M"               >> /usr/local/etc/php/conf.d/moodle.ini \
+ && echo "max_execution_time=300"          >> /usr/local/etc/php/conf.d/moodle.ini \
+ && echo "opcache.enable=1"                >> /usr/local/etc/php/conf.d/moodle.ini \
+ && echo "opcache.validate_timestamps=1"   >> /usr/local/etc/php/conf.d/moodle.ini
+
 
 # (Optional) explicitly set document root – we’ll still serve /moodle
 ENV APACHE_DOCUMENT_ROOT=/var/www/html
