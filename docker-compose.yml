@@ -1,0 +1,50 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:14
+    container_name: moodle-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - moodle-net
+
+  moodle:
+    build: .
+    container_name: moodle-app
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      # DB settings (read by config.php via env())
+      DB_HOST: ${DB_HOST}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+      DB_PORT: ${DB_PORT}
+      DB_PREFIX: ${DB_PREFIX}
+
+      # Moodle URL + paths (local)
+      MOODLE_WWWROOT: ${MOODLE_WWWROOT}
+      MOODLE_DATAROOT: ${MOODLE_DATAROOT}
+
+      # HTTPS flags (off for local)
+      MOODLE_SSLPROXY: ${MOODLE_SSLPROXY}
+      MOODLE_COOKIESECURE: ${MOODLE_COOKIESECURE}
+    volumes:
+      - ./moodledata:/var/moodledata
+    ports:
+      - "8080:80"
+    networks:
+      - moodle-net
+
+volumes:
+  db_data:
+
+networks:
+  moodle-net:
